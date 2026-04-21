@@ -8,3 +8,17 @@ html,body{
   height: 100%;
   width: 100%;
 }
+.notes{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 10px;
+}
+.note{
+  height: 100px;
+  width: 200px;
+  color: wheat;
+  border-radius: 10px;
+  background-color: #212121;
+
+}
