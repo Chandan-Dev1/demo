@@ -4,6 +4,8 @@ const app = express()
 const cors = require("cors")
 app.use(cors())
 app.use(express.json())
+app.use(express.static("./public"))
+
 
 app.post("/notes",async (req,res)=>{
     const {title,description}=req.body
@@ -48,5 +50,9 @@ app.patch("/notes/:id", async (req, res) => {
         notes
     });
 });
+
+app.use("*name",(req,res)=>{
+    res.send("this is wild card ")
+})
 
  module.exports=app

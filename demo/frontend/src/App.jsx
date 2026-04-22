@@ -4,7 +4,6 @@ import axios from "axios"
 export const App = () => {
   const [notes, setnotes] = useState([
 ])
-console.log("hello word")
 
 function fatchnote(){
      axios.get("http://localhost:3000/notes")
@@ -45,6 +44,15 @@ function deletenote(note){
 
 }
 
+function updatenote(note){
+  axios.patch("http://localhost:3000/notes/" + note._id, {
+    title: note.title,
+    description: note.description
+  })
+  .then(()=>{
+    fatchnote()
+  })
+}
   return (
      <>
      <form className='note-create-form' onSubmit={handlesubmit}>
@@ -60,6 +68,7 @@ function deletenote(note){
               <h1>{note.title}</h1>
               <p>{note.description}</p>
               <button onClick={()=>{deletenote(note._id)}}>delete</button>
+              <button onClick={()=>{updatenote(note._id)}}>update</button>
             </div>
           )
         })
