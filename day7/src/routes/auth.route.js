@@ -31,4 +31,36 @@ res.cookie("cookie",token)
     })
 })
 
+authRoutes.get("/register", async (req,res)=>{
+    const {email,password}=req.body
+
+    const user = await UserModel.findOne({email})
+
+    if(!user){
+        return res.status(404).json({
+            message:"user not found"
+        })
+    }
+    
+    const fatchpassword = user.password===password
+
+    if(!fatchpassword){
+        return res.status(401).json({
+            message:"invailid password"
+        })
+    }
+
+    const token=jwt.sign({
+        id:user._id
+    },  
+    process.env.JWT_SECRET
+    )
+
+    res.cookie("token",token)
+    res.status(200).json({
+        message:"login successfully ",
+        user
+    })
+})
+
 module.exports=authRoutes
