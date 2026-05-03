@@ -1,5 +1,6 @@
 const UserModel = require("../models/user.model")
 const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
 
 async function Register(req,res){
     const {username,email,password,bio,profileImage}=req.body
@@ -16,11 +17,12 @@ async function Register(req,res){
             message:"user is already exist", 
         })
     }
+    const hash = await bcrypt.hash(password,10)
 
     const user = await UserModel.create({
         username,
         email,
-        password,
+        password:hash,
         bio,
         profileImage
     })
@@ -59,6 +61,14 @@ $or: [
 if(!user){
     return res.status(404).json({
         message:"user not found"
+    })
+}
+
+const isVailidPassword = await  bcrypt.compare(password,user.password)
+
+if(!isVailidPassword){
+    return res.status(404).json({
+        message:"invalid password"
     })
 }
 

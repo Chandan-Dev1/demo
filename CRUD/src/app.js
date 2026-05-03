@@ -37,9 +37,9 @@ app.delete("/notes/:id", async(req,res)=>{
 
 app.patch("/notes/:id", async (req, res) => {
     const id = req.params.id;
-    const {description}=req.body
+    const {description,title}=req.body
 
-    const notes = await notesModel.findByIdAndUpdate(id,{description});
+    const notes = await notesModel.findByIdAndUpdate(id,{description,title});
 
     res.status(200).json({
         message: "notes updated successfully",
