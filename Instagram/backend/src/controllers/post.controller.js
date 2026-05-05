@@ -10,25 +10,6 @@ const imagekit = new ImageKit({
 async function CreatePostController(req,res) {
     console.log(req.file)
 
-    const token = req.cookies.token
-
-    if(!token){
-        return res.status(401).json({
-            message:"user not found "
-        }) 
-    }
-     let decoded =null
-    try{
-        decoded = jwt.verify(token,process.env.JWT_SECRET)
-    }
-    catch (err) {
-        return res.status(401).json({
-            message:"user is anthorise "
-        })
-    }
-  
-
-
     const file = await imagekit.files.upload({
         file:await toFile(Buffer.from(req.file.buffer),'file'),
         fileName:"test",
@@ -38,7 +19,7 @@ async function CreatePostController(req,res) {
     const post =  await PostModel.create({
         caption:req.body.caption,
         imgUri:file.url,
-        user:decoded.id
+        user:req.user.id
     })
     res.status(201).json({
     message:"post create suceessfuly",
@@ -47,19 +28,8 @@ async function CreatePostController(req,res) {
 }
 
 async function getPostController(req,res) {
-    const token = req.cookies.token
-    
-    let decoded=null
-
-    try{
-        decoded=jwt.verify(token,process.env.JWT_SECRET)
-    }
-    catch (err){
-        return res.status(401).json({
-            message:"user is anuthorize access"
-        })
-    }
-    const UserId = decoded.id
+   
+    const UserId = req.user
     const posts = await PostModel.find({
         user:UserId
     })
@@ -70,25 +40,8 @@ async function getPostController(req,res) {
 }
 
 async function getPostDetail(req,res){
-    const token = req.cookies.token
-
-    if(!token){
-        return res.status(401).json({
-            message:"anuthorize user access"
-        })
-    }
     
-    let decoded=null
-    try{
-        decoded=jwt.verify(token,process.env.JWT_SECRET)
-    }
-    catch (err){
-        return res.status(401).json({
-            message:"anuthorize user access"
-        })
-    }
-
-    const UserId = decoded.id
+    const UserId = req.user
     const  postId=req.params.postId
 
     if(!postId){
@@ -96,6 +49,17 @@ async function getPostDetail(req,res){
             message:"post not found"
         })
     }
+    const isvalidUser = post.user.toStrin() === UserId
+
+    if(!isvalidUser){
+        return res.status(403).jso({
+            message:"not create a post "
+        })
+    }
+    return res.status(200).jso({
+        message:"post create successfully ",
+        post
+    })
 }
 
-module.exports={CreatePostController,getPostController}
+module.exports={CreatePostController,getPostController,getPostDetail}
