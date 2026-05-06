@@ -9,6 +9,7 @@ const PostController = require("../controllers/post.controller")
 PostRoutes.post("/",upload.single("image"),identifyUser,PostController.CreatePostController)
 
 PostRoutes.get("/",identifyUser,PostController.getPostController)
-PostRoutes.get("/detail/:postId",identifyUser,PostController.getPostDetail)
+PostRoutes.get("/detail/:postId",identifyUser,PostController.getPostController)
+PostRoutes.post("/like/:postId", identifyUser,PostController.likePostController)
 
 module.exports=PostRoutes

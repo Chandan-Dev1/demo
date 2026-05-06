@@ -2,6 +2,7 @@ const PostModel = require("../models/post.model")
 const ImageKit = require("@imagekit/nodejs")
 const {toFile} = require("@imagekit/nodejs")
 const jwt = require("jsonwebtoken")
+const likeModel = require("../models/like.model")
 
 
 const imagekit = new ImageKit({
@@ -29,7 +30,7 @@ async function CreatePostController(req,res) {
 
 async function getPostController(req,res) {
    
-    const UserId = req.user
+    const UserId = req.user.id
     const posts = await PostModel.find({
         user:UserId
     })
@@ -39,27 +40,59 @@ async function getPostController(req,res) {
     })
 }
 
-async function getPostDetail(req,res){
-    
-    const UserId = req.user
-    const  postId=req.params.postId
+async function getPostDetailsController(req, res) {
 
-    if(!postId){
-        return res.status(404).jso({
-            message:"post not found"
+
+    const userId = req.user.id
+    const postId = req.params.postId
+
+    const post = await PostModel.findById(postId)
+
+    if (!post) {
+        return res.status(404).json({
+            message: "Post not found."
         })
     }
-    const isvalidUser = post.user.toStrin() === UserId
 
-    if(!isvalidUser){
-        return res.status(403).jso({
-            message:"not create a post "
+    const isValidUser = post.user.toString() === userId
+
+    if (!isValidUser) {
+        return res.status(403).json({
+            message: "Forbidden Content."
         })
     }
-    return res.status(200).jso({
-        message:"post create successfully ",
+
+    return res.status(200).json({
+        message: "Post fetched  successfully.",
         post
     })
+
 }
 
-module.exports={CreatePostController,getPostController,getPostDetail}
+async function likePostController(req, res) {
+
+    const username = req.user.username
+    const postId = req.params.postId
+
+    const post = await PostModel.findById(postId)
+
+    if (!post) {
+        return res.status(404).json({
+            message: "Post not found."
+        })
+    }
+
+    const like = await likeModel.create({
+        post: postId,
+        user: username
+    })
+
+    res.status(200).json({
+        message: "Post liked successfully.",
+        like
+    })
+
+}
+
+
+module.exports={CreatePostController,getPostController,getPostController,likePostController}
